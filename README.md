@@ -83,12 +83,12 @@ Vytvorenie stage bolo zabezpečené príkazom:
 
 ```sql
 CREATE OR REPLACE STAGE my_stage;
+---
 Do stage boli následne nahraté súbory obsahujúce údaje o knihách, používateľoch, hodnoteniach, zamestnaniach a úrovniach vzdelania.
 Dáta boli importované do staging tabuliek pomocou príkazu COPY INTO.
 Pre každú tabuľku sa použil podobný príkaz:
-
-sql
-Kopírovať kód
+---
+```sql
 COPY INTO occupations_staging
 FROM @my_stage/occupations.csv
 FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1)
