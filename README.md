@@ -99,22 +99,39 @@ Parameter ON_ERROR = 'CONTINUE' zabezpečil pokračovanie procesu bez prerušeni
 
 
 ---
+#3.2 Transformácia dát (Transform)
+Transformácie zahŕňali vytvorenie dimenzií a faktovej tabuľky.
 
-### 3.2 Transform (Transformácia dát)
-
-V tejto fáze boli dáta zo staging tabuliek vyčistené, transformované a obohatené. Hlavným cieľom bolo pripraviť dimenzie a faktovú tabuľku, ktoré umožnia jednoduchú a efektívnu analýzu.
-
-Príklad vytvorenia dimenzie `dim_movies`:
+Vytvorenie dimenzií:
+Príklad vytvorenia dimenzií dim_artist a dim_album:
 
 ```sql
-CREATE OR REPLACE TABLE dim_movies AS
-SELECT 
-    id AS movie_id,
-    title,
-    year,
-    duration,
-    country,
-    languages,
-    production_company
-FROM movie;
+CREATE OR REPLACE TABLE dim_artist AS
+SELECT `ArtistId`, `Name`
+FROM `artist`;
 ```
+```sql
+Kopírovať kód
+CREATE OR REPLACE TABLE dim_album AS
+SELECT `AlbumId`, `Title`, `ArtistId`
+FROM `album`;
+```
+---
+Vytvorenie faktovej tabuľky:
+Príklad vytvorenia faktovej tabuľky fact_invoice_line:
+
+```sql
+CREATE OR REPLACE TABLE fact_invoice_line AS
+SELECT 
+  il.`InvoiceLineId`, 
+  il.`InvoiceId`, 
+  il.`TrackId`, 
+  il.`UnitPrice`, 
+  il.`Quantity`, 
+  il.`UnitPrice` * il.`Quantity` AS TotalAmount,
+  i.`InvoiceDate`, 
+  i.`CustomerId`
+FROM `invoiceline` il
+JOIN `invoice` i ON il.`InvoiceId` = i.`InvoiceId`;
+```
+
