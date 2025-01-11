@@ -68,9 +68,7 @@ Navrhnutý bol **hviezdicový model (star schema)** pre efektívnu analýzu, kde
 
 ---
 
-Štruktúra hviezdicového modelu je znázornená na diagrame nižšie. Diagram ukazuje prepojenia medzi faktovou tabuľkou a dimenziami, čo zjednodušuje pochopenie a implementáciu modelu.
-
-*(Vlož sem diagram hviezdicového modelu ako obrázok z priečinka DOCS)*
+![Star_schema](https://github.com/sofa229/IMDb/blob/main/hviezdicovy_diagram.JPG)
 
 ---
 
