@@ -18,7 +18,6 @@ Zdrojové dáta obsahujú tieto tabuľky:
 ### 1.1 Dátová architektúra
 
 **ERD diagram**  
-Surové dáta sú usporiadané v relačnom modeli, ktorý je znázornený na entitno-relačnom diagrame (ERD):
 
 ![Chinook_ERD](https://github.com/sofa229/IMDb/blob/main/IMDB_ERD.png)
 
