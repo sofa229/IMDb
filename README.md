@@ -15,7 +15,7 @@ Zdrojové dáta obsahujú tieto tabuľky:
 - **ratings** – obsahuje hodnotenia filmov (priemerné hodnotenie, počet hlasov).
 - **genre** – obsahuje žánre jednotlivých filmov.
 
-### 1.1 Dátová architektúra
+## 1.1 Dátová architektúra
 
 **ERD diagram**  
 
@@ -33,7 +33,7 @@ Navrhnutý bol **hviezdicový model (star schema)** pre efektívnu analýzu, kde
 - **dim_genres** – obsahuje žánre jednotlivých filmov.
 - **dim_dates** – obsahuje informácie o dátumoch hodnotenia (rok, mesiac, deň).
 
-### Faktová tabuľka: `fact_ratings`
+## Faktová tabuľka: `fact_ratings`
 
 | Stĺpec           | Popis                                     |
 |------------------|-------------------------------------------|
@@ -45,7 +45,7 @@ Navrhnutý bol **hviezdicový model (star schema)** pre efektívnu analýzu, kde
 | `date_id`        | ID dátumu hodnotenia (prepojené s dim_date). |
 | `time_id`        | ID času hodnotenia (prepojené s dim_time). |
 
-### Dimenzie
+## Dimenzie
 
 - **`dim_movie`**: Obsahuje detaily o filmoch.  
   **Atribúty**: `movie_id`, `title`, `year`, `duration`, `country`, `languages`, `production_company`.
@@ -75,7 +75,7 @@ Navrhnutý bol **hviezdicový model (star schema)** pre efektívnu analýzu, kde
 
 ETL proces pozostával z troch hlavných fáz: **extrahovanie (Extract)**, **transformácia (Transform)** a **načítanie (Load)**. Tento proces bol implementovaný v Snowflake s cieľom pripraviť zdrojové dáta zo staging vrstvy do viacdimenzionálneho modelu vhodného na analýzu a vizualizáciu.
 
-# **3.1 Extract (Extrahovanie dát)**
+## **3.1 Extract (Extrahovanie dát)**
 
 Dáta zo zdrojového datasetu (formát `.csv`) boli najprv nahraté do **Snowflake** prostredníctvom interného stage úložiska s názvom `my_stage`.  
 Stage v **Snowflake** slúži ako dočasné úložisko na import alebo export dát.  
@@ -99,7 +99,7 @@ Parameter ON_ERROR = 'CONTINUE' zabezpečil pokračovanie procesu bez prerušeni
 
 
 ---
-#3.2 Transformácia dát (Transform)
+## 3.2 Transformácia dát (Transform)
 Transformácie zahŕňali vytvorenie dimenzií a faktovej tabuľky.
 
 Vytvorenie dimenzií:
