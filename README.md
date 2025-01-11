@@ -68,7 +68,7 @@ Navrhnutý bol **hviezdicový model (star schema)** pre efektívnu analýzu, kde
 
 ---
 
-![Star_schema](https://github.com/sofa229/IMDb/blob/main/hviezdicovy_diagram.JPG)
+![Star_schema]([https://github.com/sofa229/IMDb/blob/main/hviezdicovy_diagram.JPG](https://github.com/sofa229/IMDb/blob/main/star_diagram.png))
 
 ---
 
