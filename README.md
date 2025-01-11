@@ -134,4 +134,20 @@ SELECT
 FROM `invoiceline` il
 JOIN `invoice` i ON il.`InvoiceId` = i.`InvoiceId`;
 ```
+## 3.3 Load (Načítanie dát)
+Po úspešnom vytvorení dimenzií a faktovej tabuľky boli dáta nahraté do finálnej štruktúry. Na záver boli staging tabuľky odstránené, aby sa optimalizovalo využitie úložiska:
+
+```sql
+DROP TABLE IF EXISTS books_staging;
+DROP TABLE IF EXISTS education_levels_staging;
+DROP TABLE IF EXISTS occupations_staging;
+DROP TABLE IF EXISTS ratings_staging;
+DROP TABLE IF EXISTS users_staging;
+```
+
+
+
+
+
+
 
