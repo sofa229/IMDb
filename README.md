@@ -146,7 +146,12 @@ DROP TABLE IF EXISTS invoice_staging;
 DROP TABLE IF EXISTS customer_staging;
 DROP TABLE IF EXISTS track_staging;
 ```
-
+## **4. Vizualizácia dát**
+Navrhnutých bolo 5 vizualizácií, ktoré poskytujú prehľad o dôležitých metrikách:
+![Snímka obrazovky (342)]https://github.com/sofa229/IMDb/blob/main/celkove_trzby.JPG)  ![Snímka obrazovky (344)]https://github.com/sofa229/IMDb/blob/main/pocet_filmov_pre_zaner.JPG) 
+![Snímka obrazovky (349)](https://github.com/sofa229/IMDb/blob/main/pocet_vydanych_filmov_podla_rokov.JPG)
+![Snímka obrazovky (346)](https://github.com/sofa229/IMDb/blob/main/priemerne_recenzie.JPG) 
+![Snímka obrazovky (347)](https://github.com/sofa229/IMDb/blob/main/top_10.JPG)
 
 ```sql
 Autor: Sofia Kučerová
