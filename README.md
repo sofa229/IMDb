@@ -94,15 +94,6 @@ FROM @my_stage/occupations.csv
 FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1)
 ON_ERROR = 'CONTINUE';
 Parameter ON_ERROR = 'CONTINUE' zabezpečil pokračovanie procesu bez prerušenia pri výskyte nekonzistentných záznamov.
-### 3.1 # Extract (Extrahovanie dát)
-
-Dáta zo zdrojovej databázy boli najprv nahraté do Snowflake. Tento krok zahŕňal import dát z MySQL dumpu, ktorý obsahoval údaje o filmoch, žánroch, hodnoteniach a tržbách. MySQL dump bol najskôr spracovaný a pripravený na import.
-
-Dáta boli importované do staging tabuliek v Snowflake pomocou príkazu `COPY INTO`, ktorý umožňuje načítať dáta z externého úložiska do staging tabuliek v Snowflake. Ako dočasné úložisko bol použitý stage s názvom `my_stage`. Vytvorenie stage bolo zabezpečené príkazom:
-
-```sql
-CREATE OR REPLACE STAGE my_stage;
-
 
 
 ---
