@@ -75,9 +75,14 @@ Navrhnutý bol **hviezdicový model (star schema)** pre efektívnu analýzu, kde
 
 ETL proces pozostával z troch hlavných fáz: **extrahovanie (Extract)**, **transformácia (Transform)** a **načítanie (Load)**. Tento proces bol implementovaný v Snowflake s cieľom pripraviť zdrojové dáta zo staging vrstvy do viacdimenzionálneho modelu vhodného na analýzu a vizualizáciu.
 
-### 3.1 Extract (Extrahovanie dát)
+### 3.1 # Extract (Extrahovanie dát)
 
-Dáta zo zdrojovej databázy boli najprv nahraté do Snowflake. Tento krok zahŕňal import dát z MySQL dumpu do staging tabuliek v Snowflake.
+Dáta zo zdrojovej databázy boli najprv nahraté do Snowflake. Tento krok zahŕňal import dát z MySQL dumpu, ktorý obsahoval údaje o filmoch, žánroch, hodnoteniach a tržbách. MySQL dump bol najskôr spracovaný a pripravený na import.
+
+Dáta boli importované do staging tabuliek v Snowflake pomocou príkazu `COPY INTO`, ktorý umožňuje načítať dáta z externého úložiska do staging tabuliek v Snowflake. Ako dočasné úložisko bol použitý stage s názvom `my_stage`. Vytvorenie stage bolo zabezpečené príkazom:
+
+```sql
+CREATE OR REPLACE STAGE my_stage;
 
 
 
