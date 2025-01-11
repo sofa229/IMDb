@@ -148,7 +148,9 @@ DROP TABLE IF EXISTS track_staging;
 ```
 
 
-
+```sql
+Autor: Sofia Kučerová
+```
 
 
 
