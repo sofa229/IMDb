@@ -103,18 +103,61 @@ Parameter ON_ERROR = 'CONTINUE' zabezpečil pokračovanie procesu bez prerušeni
 Transformácie zahŕňali vytvorenie dimenzií a faktovej tabuľky.
 
 Vytvorenie dimenzií:
-Príklad vytvorenia dimenzií dim_artist a dim_album:
+Príklad vytvorenia dimenzií dim_movies, dim_genres, dim_directors a dim_actors:
 
+Dimenzia dim_movies
 ```sql
-CREATE OR REPLACE TABLE dim_artist AS
-SELECT `ArtistId`, `Name`
-FROM `artist`;
+CREATE OR REPLACE TABLE dim_movies AS
+SELECT 
+  id AS movie_id,
+  title,
+  year,
+  duration,
+  country,
+  languages,
+  production_company
+FROM movie;
 ```
+Dimenzia dim_genres
 ```sql
-Kopírovať kód
-CREATE OR REPLACE TABLE dim_album AS
-SELECT `AlbumId`, `Title`, `ArtistId`
-FROM `album`;
+CREATE OR REPLACE TABLE dim_genres AS
+SELECT DISTINCT 
+  g.movie_id,
+  g.genre
+FROM genre g;
+```
+Dimenzia dim_directors
+```sql
+CREATE OR REPLACE TABLE dim_directors AS
+SELECT 
+  dm.movie_id,
+  n.name AS director_name,
+  n.date_of_birth
+FROM director_mapping dm
+JOIN names n ON dm.name_id = n.id;
+```
+Dimenzia dim_actors
+```sql
+CREATE OR REPLACE TABLE dim_actors AS
+SELECT 
+  rm.movie_id,
+  n.name AS actor_name,
+  n.height,
+  n.date_of_birth
+FROM role_mapping rm
+JOIN names n ON rm.name_id = n.id
+WHERE rm.category = 'actor';
+```
+Dimenzia dim_dates
+```sql
+CREATE OR REPLACE TABLE dim_dates AS
+SELECT 
+  DISTINCT DATE_PART('year', date_published) AS year,
+  DATE_PART('month', date_published) AS month,
+  DATE_PART('day', date_published) AS day,
+  date_published AS full_date
+FROM movie
+WHERE date_published IS NOT NULL;
 ```
 ---
 Vytvorenie faktovej tabuľky:
