@@ -122,17 +122,17 @@ Dimenzia dim_genres
 ```sql
 CREATE OR REPLACE TABLE dim_genres AS
 SELECT DISTINCT 
-  g.movie_id,
-  g.genre
-FROM genre g;
+    movie_id,
+    genre
+FROM genre;
 ```
 Dimenzia dim_directors
 ```sql
 CREATE OR REPLACE TABLE dim_directors AS
 SELECT 
-  dm.movie_id,
-  n.name AS director_name,
-  n.date_of_birth
+    dm.movie_id,
+    n.name AS director_name,
+    n.date_of_birth
 FROM director_mapping dm
 JOIN names n ON dm.name_id = n.id;
 ```
@@ -140,10 +140,10 @@ Dimenzia dim_actors
 ```sql
 CREATE OR REPLACE TABLE dim_actors AS
 SELECT 
-  rm.movie_id,
-  n.name AS actor_name,
-  n.height,
-  n.date_of_birth
+    rm.movie_id,
+    n.name AS actor_name,
+    n.height,
+    n.date_of_birth
 FROM role_mapping rm
 JOIN names n ON rm.name_id = n.id
 WHERE rm.category = 'actor';
@@ -166,11 +166,11 @@ Príklad vytvorenia faktovej tabuľky fact_movies:
 ```sql
 CREATE OR REPLACE TABLE fact_movies AS
 SELECT 
-  m.id AS movie_id,
-  COALESCE(r.avg_rating, 0) AS avg_rating,
-  COALESCE(r.total_votes, 0) AS total_votes,
-  COALESCE(r.median_rating, 0) AS median_rating,
-  m.worlwide_gross_income
+    m.id AS movie_id,
+    r.avg_rating,
+    r.total_votes,
+    r.median_rating,
+    m.worlwide_gross_income
 FROM movie m
 LEFT JOIN ratings r ON m.id = r.movie_id;
 ```
