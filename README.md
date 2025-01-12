@@ -161,33 +161,30 @@ WHERE date_published IS NOT NULL;
 ```
 ---
 Vytvorenie faktovej tabuľky:
-Príklad vytvorenia faktovej tabuľky fact_invoice_line:
+Príklad vytvorenia faktovej tabuľky fact_movies:
 
 ```sql
-CREATE OR REPLACE TABLE fact_invoice_line AS
+CREATE OR REPLACE TABLE fact_movies AS
 SELECT 
-  il.`InvoiceLineId`, 
-  il.`InvoiceId`, 
-  il.`TrackId`, 
-  il.`UnitPrice`, 
-  il.`Quantity`, 
-  il.`UnitPrice` * il.`Quantity` AS TotalAmount,
-  i.`InvoiceDate`, 
-  i.`CustomerId`
-FROM `invoiceline` il
-JOIN `invoice` i ON il.`InvoiceId` = i.`InvoiceId`;
+  m.id AS movie_id,
+  COALESCE(r.avg_rating, 0) AS avg_rating,
+  COALESCE(r.total_votes, 0) AS total_votes,
+  COALESCE(r.median_rating, 0) AS median_rating,
+  m.worlwide_gross_income
+FROM movie m
+LEFT JOIN ratings r ON m.id = r.movie_id;
 ```
 ### **3.3 Load (Načítanie dát)**
 
 Po úspešnom vytvorení dimenzií a faktovej tabuľky boli dáta nahraté do finálnej štruktúry. Na záver boli staging tabuľky odstránené, aby sa optimalizovalo využitie úložiska:
 
 ```sql
-DROP TABLE IF EXISTS artist_staging;
-DROP TABLE IF EXISTS album_staging;
-DROP TABLE IF EXISTS invoiceline_staging;
-DROP TABLE IF EXISTS invoice_staging;
-DROP TABLE IF EXISTS customer_staging;
-DROP TABLE IF EXISTS track_staging;
+DROP TABLE IF EXISTS movie_staging;
+DROP TABLE IF EXISTS genre_staging;
+DROP TABLE IF EXISTS director_mapping_staging;
+DROP TABLE IF EXISTS role_mapping_staging;
+DROP TABLE IF EXISTS names_staging;
+DROP TABLE IF EXISTS ratings_staging;
 ```
 ## **4. Vizualizácia dát**
 Navrhnutých bolo 5 vizualizácií, ktoré poskytujú prehľad o dôležitých metrikách:
