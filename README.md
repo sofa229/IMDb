@@ -105,7 +105,10 @@ Transformácie zahŕňali vytvorenie dimenzií a faktovej tabuľky.
 Vytvorenie dimenzií:
 Príklad vytvorenia dimenzií dim_movies, dim_genres, dim_directors a dim_actors:
 
-Dimenzia dim_movies
+#### Dimenzia dim_movies
+Dimenzia dim_movies obsahuje informácie o filmoch vrátane názvu, roku vydania, krajiny pôvodu, jazyka a produkčnej spoločnosti. Transformácia zahŕňala vyčistenie údajov o názvoch filmov a ich kategorizáciu podľa roku vydania.
+Táto dimenzia je typu SCD 1, pretože aktualizácie údajov prepíšu pôvodné hodnoty bez uchovania histórie.
+
 ```sql
 CREATE OR REPLACE TABLE dim_movies AS
 SELECT 
@@ -118,7 +121,9 @@ SELECT
   production_company
 FROM movie;
 ```
-Dimenzia dim_genres
+#### Dimenzia dim_genres
+Dimenzia dim_genres obsahuje žánre filmov, napríklad „komédia“, „drama“ alebo „thriller“. Keďže údaje o žánroch sa menia veľmi zriedkavo, použili sme typ SCD 1, ktorý prepíše staré hodnoty bez uchovávania historických zmien.
+
 ```sql
 CREATE OR REPLACE TABLE dim_genres AS
 SELECT DISTINCT 
@@ -126,7 +131,10 @@ SELECT DISTINCT
     genre
 FROM genre;
 ```
-Dimenzia dim_directors
+#### Dimenzia dim_directors
+Dimenzia dim_directors obsahuje údaje o režiséroch filmov vrátane ich mien a dátumov narodenia. Transformácia zahŕňala štandardizáciu mien režisérov a kontrolu duplicitných záznamov.
+Táto dimenzia je typu SCD 1, pretože akékoľvek zmeny údajov budú prepísané bez sledovania histórie.
+
 ```sql
 CREATE OR REPLACE TABLE dim_directors AS
 SELECT 
@@ -136,7 +144,9 @@ SELECT
 FROM director_mapping dm
 JOIN names n ON dm.name_id = n.id;
 ```
-Dimenzia dim_actors
+#### Dimenzia dim_actors
+Dimenzia dim_actors obsahuje mená hercov, kategórie, v ktorých účinkovali, a ďalšie súvisiace informácie. Vzhľadom na to, že údaje o hercoch sa môžu občas meniť, ale bez nutnosti sledovania historických zmien, bola zvolená stratégia SCD 1, kde nové údaje nahrádzajú pôvodné.
+
 ```sql
 CREATE OR REPLACE TABLE dim_actors AS
 SELECT 
@@ -148,7 +158,10 @@ FROM role_mapping rm
 JOIN names n ON rm.name_id = n.id
 WHERE rm.category = 'actor';
 ```
-Dimenzia dim_dates
+#### Dimenzia dim_dates
+Dimenzia dim_dates obsahuje dátumy rozdelené na deň, mesiac, rok a štvrťrok. Tieto údaje sú odvodené z dátumov vydania filmov a nepredpokladáme ich zmenu.
+Táto dimenzia je typu SCD 1, keďže údaje sú statické. 
+
 ```sql
 CREATE OR REPLACE TABLE dim_dates AS
 SELECT 
