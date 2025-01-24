@@ -51,10 +51,10 @@ Navrhnutý bol **hviezdicový model (star schema)** pre efektívnu analýzu, kde
   **Atribúty**: `movie_id`, `title`, `year`, `duration`, `country`, `languages`, `production_company`.
 
 - **`dim_directors`**: Informácie o režiséroch.  
-  **Atribúty**: `director_id`, `name`, `date_of_birth`, `known_for_movies`.
+  **Atribúty**: `director_id`, `name`, `date_of_birth`.
 
 - **`dim_actors`**: Informácie o hercoch.  
-  **Atribúty**: `actor_id`, `name`, `category`, `known_for_movies`.
+  **Atribúty**: `actor_id`, `name`, `category`.
 
 - **`dim_genres`**: Obsahuje detaily o žánroch.  
   **Atribúty**: `genre_id`, `name`.
