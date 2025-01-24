@@ -82,17 +82,17 @@ Stage v **Snowflake** slúži ako dočasné úložisko na import alebo export d�
 Vytvorenie stage bolo zabezpečené príkazom:
 
 ```sql
-CREATE OR REPLACE STAGE my_stage;
+CREATE OR REPLACE STAGE imdb_stage;
 ```
 ---
-Do stage boli následne nahraté súbory obsahujúce údaje o knihách, používateľoch, hodnoteniach, zamestnaniach a úrovniach vzdelania.
+Do stage boli následne nahraté súbory obsahujúce údaje o filmoch, žánroch, réžiách, rolách, menách, hodnoteniach. , zamestnaniach a úrovniach vzdelania.
 Dáta boli importované do staging tabuliek pomocou príkazu COPY INTO.
 Pre každú tabuľku sa použil podobný príkaz:
 ---
 ```sql
-COPY INTO occupations_staging
-FROM @my_stage/occupations.csv
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1)
+COPY INTO movie
+FROM @imdb_stage/movie.csv  
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1)  
 ON_ERROR = 'CONTINUE';
 ```
 Parameter ON_ERROR = 'CONTINUE' zabezpečil pokračovanie procesu bez prerušenia pri výskyte nekonzistentných záznamov.
