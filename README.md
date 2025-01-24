@@ -47,22 +47,22 @@ Navrhnutý bol **hviezdicový model (star schema)** pre efektívnu analýzu, kde
 
 ## Dimenzie
 
-- **`dim_movie`**: Obsahuje detaily o filmoch.  
+- **`dim_movies`**: Obsahuje detaily o filmoch.  
   **Atribúty**: `movie_id`, `title`, `year`, `duration`, `country`, `languages`, `production_company`.
 
-- **`dim_director`**: Informácie o režiséroch.  
+- **`dim_directors`**: Informácie o režiséroch.  
   **Atribúty**: `director_id`, `name`, `date_of_birth`, `known_for_movies`.
 
-- **`dim_actor`**: Informácie o hercoch.  
+- **`dim_actors`**: Informácie o hercoch.  
   **Atribúty**: `actor_id`, `name`, `category`, `known_for_movies`.
 
-- **`dim_genre`**: Obsahuje detaily o žánroch.  
+- **`dim_genres`**: Obsahuje detaily o žánroch.  
   **Atribúty**: `genre_id`, `name`.
 
-- **`dim_date`**: Informácie o dátume hodnotenia.  
+- **`dim_dates`**: Informácie o dátume hodnotenia.  
   **Atribúty**: `date_id`, `day`, `month`, `year`, `quarter`.
 
-- **`dim_time`**: Podrobné časové údaje.  
+- **`dim_times`**: Podrobné časové údaje.  
   **Atribúty**: `time_id`, `hour`, `minute`, `ampm`.
 
 ---
