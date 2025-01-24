@@ -62,7 +62,7 @@ Navrhnutý bol **hviezdicový model (star schema)** pre efektívnu analýzu, kde
 - **`dim_dates`**: Informácie o dátume hodnotenia.  
   **Atribúty**: `date_id`, `day`, `month`, `year`, `quarter`.
 
-- **`dim_times`**: Podrobné časové údaje.  
+- **`dim_time`**: Podrobné časové údaje.  
   **Atribúty**: `time_id`, `hour`, `minute`, `ampm`.
 
 ---
