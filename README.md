@@ -91,7 +91,8 @@ Dimenzionálny model bol navrhnutý tak, aby umožňoval efektívnu analytiku fi
 | date_of_birth | DATE        | Dátum narodenia |
 | known_for_movies | VARCHAR(100) | Najznámejšie filmy |
 
-![Star_schema][((https://github.com/sofa229/IMDb/blob/4c2ce4cabd7c96cc1035950396f297daf9d50874/hviezdicovyimdb.png))]
+![Star Schema](https://github.com/sofa229/IMDb/blob/4c2ce4cabd7c96cc1035950396f297daf9d50874/hviezdicovyimdb.png?raw=true)
+
 ---
 
 ## 3. ETL proces v Snowflake
