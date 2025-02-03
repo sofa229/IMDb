@@ -101,115 +101,109 @@ ETL proces pozostával z troch hlavných fáz: **extrahovanie (Extract)**, **tra
 
 ## **3.1 Extract (Extrahovanie dát)**
 
-Dáta zo zdrojového datasetu (formát `.csv`) boli najprv nahraté do **Snowflake** prostredníctvom interného stage úložiska s názvom `my_stage`.  
+Dáta zo zdrojového datasetu (formát `.csv`) boli najprv nahraté do **Snowflake** prostredníctvom interného stage úložiska s názvom `HEDGEHOG_stage`.  
 Stage v **Snowflake** slúži ako dočasné úložisko na import alebo export dát.  
 Vytvorenie stage bolo zabezpečené príkazom:
 
 ```sql
-CREATE OR REPLACE STAGE imdb_stage;
+CREATE OR REPLACE STAGE HEDGEHOG_stage;
 ```
 ---
-Do stage boli následne nahraté súbory obsahujúce údaje o filmoch, žánroch, réžiách, rolách, menách, hodnoteniach. , zamestnaniach a úrovniach vzdelania.
-Dáta boli importované do staging tabuliek pomocou príkazu COPY INTO.
-Pre každú tabuľku sa použil podobný príkaz:
+Do stage boli následne nahraté súbory obsahujúce údaje o filmoch, žánroch, réžiách, rolách, menách a hodnoteniach. Dáta boli importované do staging tabuliek pomocou príkazu COPY INTO. Pre každú tabuľku sa použil podobný príkaz:
 ---
 ```sql
-COPY INTO movie
-FROM @imdb_stage/movie.csv  
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1)  
-ON_ERROR = 'CONTINUE';
+COPY INTO movie_staging
+FROM @HEDGEHOG_stage/movie.csv  
+FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
 ```
-Parameter ON_ERROR = 'CONTINUE' zabezpečil pokračovanie procesu bez prerušenia pri výskyte nekonzistentných záznamov.
-
-
 ---
 ## 3.2 Transformácia dát (Transform)
 Transformácie zahŕňali vytvorenie dimenzií a faktovej tabuľky.
 
-Vytvorenie dimenzií:
-Príklad vytvorenia dimenzií dim_movies, dim_genres, dim_directors a dim_actors:
-
 #### Dimenzia dim_movies
-Dimenzia dim_movies obsahuje informácie o filmoch vrátane názvu, roku vydania, krajiny pôvodu, jazyka a produkčnej spoločnosti. Transformácia zahŕňala vyčistenie údajov o názvoch filmov a ich kategorizáciu podľa roku vydania.
+Obsahuje informácie o filmoch vrátane názvu, roku vydania, krajiny, jazyka a produkčnej spoločnosti.
 Táto dimenzia je typu SCD 1, pretože aktualizácie údajov prepíšu pôvodné hodnoty bez uchovania histórie.
 
 ```sql
 CREATE OR REPLACE TABLE dim_movies AS
-SELECT 
-  id AS movie_id,
-  title,
-  year,
-  duration,
-  country,
-  languages,
-  production_company
-FROM movie;
-```
-#### Dimenzia dim_genres
-Dimenzia dim_genres obsahuje žánre filmov, napríklad „komédia“, „drama“ alebo „thriller“. Keďže údaje o žánroch sa menia veľmi zriedkavo, použili sme typ SCD 1, ktorý prepíše staré hodnoty bez uchovávania historických zmien.
-
-```sql
-CREATE OR REPLACE TABLE dim_genres AS
-SELECT DISTINCT 
-    movie_id,
-    genre
-FROM genre;
-```
-#### Dimenzia dim_directors
-Dimenzia dim_directors obsahuje údaje o režiséroch filmov vrátane ich mien a dátumov narodenia. Transformácia zahŕňala štandardizáciu mien režisérov a kontrolu duplicitných záznamov.
-Táto dimenzia je typu SCD 1, pretože akékoľvek zmeny údajov budú prepísané bez sledovania histórie.
-
-```sql
-CREATE OR REPLACE TABLE dim_directors AS
-SELECT 
-    dm.movie_id,
-    n.name AS director_name,
-    n.date_of_birth
-FROM director_mapping dm
-JOIN names n ON dm.name_id = n.id;
-```
-#### Dimenzia dim_actors
-Dimenzia dim_actors obsahuje mená hercov, kategórie, v ktorých účinkovali, a ďalšie súvisiace informácie. Vzhľadom na to, že údaje o hercoch sa môžu občas meniť, ale bez nutnosti sledovania historických zmien, bola zvolená stratégia SCD 1, kde nové údaje nahrádzajú pôvodné.
-
-```sql
-CREATE OR REPLACE TABLE dim_actors AS
-SELECT 
-    rm.movie_id,
-    n.name AS actor_name,
-    n.height,
-    n.date_of_birth
-FROM role_mapping rm
-JOIN names n ON rm.name_id = n.id
-WHERE rm.category = 'actor';
+SELECT DISTINCT
+    m.movie_id,
+    m.movie_title,
+    m.movie_year,
+    m.date_published,
+    m.movie_country,
+    m.income,
+    m.languages,
+    m.company,
+    g.genre
+FROM movie_staging m
+LEFT JOIN genre_staging g ON m.movie_id = g.movie_id;
 ```
 #### Dimenzia dim_dates
-Dimenzia dim_dates obsahuje dátumy rozdelené na deň, mesiac, rok a štvrťrok. Tieto údaje sú odvodené z dátumov vydania filmov a nepredpokladáme ich zmenu.
-Táto dimenzia je typu SCD 1, keďže údaje sú statické. 
+Obsahuje informácie o dňoch, mesiacoch a rokoch vydania filmov. Keďže údaje o žánroch sa menia veľmi zriedkavo, použili sme typ SCD 1, ktorý prepíše staré hodnoty bez uchovávania historických zmien.
 
 ```sql
 CREATE OR REPLACE TABLE dim_dates AS
-SELECT 
-  DISTINCT DATE_PART('year', date_published) AS year,
-  DATE_PART('month', date_published) AS month,
-  DATE_PART('day', date_published) AS day,
-  date_published AS full_date
-FROM movie
+SELECT
+    ROW_NUMBER() OVER (ORDER BY CAST(date_published AS DATE)) AS dim_datesID,
+    CAST(date_published AS DATE) AS date,
+    DATE_PART(day, date_published) AS day,
+    DATE_PART(month, date_published) AS month,
+    DATE_PART(year, date_published) AS year
+FROM movie_staging
 WHERE date_published IS NOT NULL;
+```
+#### Dimenzia dim_names_actor
+Obsahuje informácie o hercoch a ich známych filmoch.
+Táto dimenzia je typu SCD 1, pretože akékoľvek zmeny údajov budú prepísané bez sledovania histórie.
+
+```sql
+CREATE OR REPLACE TABLE dim_names_actor AS
+SELECT DISTINCT
+    n.name_id,
+    n.name,
+    n.date_of_birth,
+    COALESCE(m.movie_title, n.known_for_movies) AS known_for_movies,
+    r.category
+FROM name_staging n
+INNER JOIN role_mapping_staging r ON n.name_id = r.name_id
+INNER JOIN movie_staging m ON r.movie_id = m.movie_id;
+```
+#### Dimenzia dim_names_director
+Obsahuje informácie o réžíroch a ich známych filmoch. Vzhľadom na to, že údaje o hercoch sa môžu občas meniť, ale bez nutnosti sledovania historických zmien, bola zvolená stratégia SCD 1, kde nové údaje nahrádzajú pôvodné.
+
+```sql
+CREATE OR REPLACE TABLE dim_names_director AS
+SELECT DISTINCT
+    n.name_id,
+    n.name,
+    n.date_of_birth,
+    COALESCE(m.movie_title, n.known_for_movies) AS known_for_movies
+FROM name_staging n
+INNER JOIN director_mapping_staging d ON n.name_id = d.name_id
+INNER JOIN movie_staging m ON d.movie_id = m.movie_id;
 ```
 ---
 Vytvorenie faktovej tabuľky:
-Príklad vytvorenia faktovej tabuľky fact_movies:
+Príklad vytvorenia faktovej tabuľky fact_ratings:
 
 ```sql
-CREATE OR REPLACE TABLE fact_movies AS
-SELECT 
-    m.id AS movie_id,
+CREATE OR REPLACE TABLE fact_ratings AS
+SELECT DISTINCT
     r.avg_rating,
     r.total_votes,
     r.median_rating,
-    m.worlwide_gross_income
-FROM movie m
-LEFT JOIN ratings r ON m.id = r.movie_id;
+    na.name_id AS Actor_id,
+    nd.name_id AS Director_id,
+    m.movie_id,
+    d.dim_datesid
+FROM ratings_staging r
+LEFT JOIN dim_movies m ON r.movie_id = m.movie_id
+LEFT JOIN dim_dates d ON m.date_published = d.date
+LEFT JOIN role_mapping_staging ro ON m.movie_id = ro.movie_id
+LEFT JOIN dim_names_actor na ON ro.name_id = na.name_id
+LEFT JOIN director_mapping_staging ma ON m.movie_id = ma.movie_id
+LEFT JOIN dim_names_director nd ON ma.name_id = nd.name_id;
 ```
 ### **3.3 Load (Načítanie dát)**
 
@@ -220,26 +214,24 @@ DROP TABLE IF EXISTS movie_staging;
 DROP TABLE IF EXISTS genre_staging;
 DROP TABLE IF EXISTS director_mapping_staging;
 DROP TABLE IF EXISTS role_mapping_staging;
-DROP TABLE IF EXISTS names_staging;
+DROP TABLE IF EXISTS name_staging;
 DROP TABLE IF EXISTS ratings_staging;
 ```
 ## **4. Vizualizácia dát**
 Navrhnutých bolo 5 vizualizácií, ktoré poskytujú prehľad o dôležitých metrikách:
 ---
-### 1. Celkové tržby filmov podľa rokov:
-Dotaz sumarizuje celkové tržby za filmy podľa rokov. Z výsledkov vidieť, že najvyššie tržby boli dosiahnuté v roku 2017, nasleduje rok 2018. Rok 2019 vykazuje nižšie tržby, pravdepodobne kvôli menšiemu počtu vydaných filmov v tomto roku.
+### 1. Priemerné hodnotenia filmov podľa roku vydania:
 
-```sql
-CREATE OR REPLACE VIEW view_total_gross_by_year AS
+```sql 
 SELECT 
-    DATE_PART('year', m.date_published) AS year,
-    SUM(TRY_TO_NUMBER(REPLACE(m.worlwide_gross_income, '$', ''))) AS total_gross
-FROM movie m
-WHERE m.worlwide_gross_income IS NOT NULL
-GROUP BY DATE_PART('year', m.date_published)
-ORDER BY year;
+    d.year, 
+    ROUND(AVG(f.avg_rating), 2) AS avg_rating
+FROM fact_ratings f
+JOIN dim_dates d ON f.dim_datesid = d.dim_datesid
+GROUP BY d.year
+ORDER BY d.year;
 ```
-![Snímka obrazovky (342)](https://github.com/sofa229/IMDb/blob/main/celkove_trzby.JPG)  
+![Snímka obrazovky (342)](graf_podla_r_vydania.JPG)  
 
 ### 2. Počet filmov podľa žánru:
 Dotaz analyzuje počet filmov priradených ku každému žánru. Z grafu vyplýva, že najviac filmov patrí do žánru Drama, nasledujú žánre Thriller, Comedy a Action.
