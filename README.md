@@ -25,50 +25,73 @@ Zdrojové dáta obsahujú tieto tabuľky:
 
 ## 2. Dimenzionálny model
 
-Navrhnutý bol **hviezdicový model (star schema)** pre efektívnu analýzu, kde centrálny bod predstavuje faktová tabuľka `fact_movies`, ktorá je prepojená s nasledujúcimi dimenziami:
-
-- **dim_movies** – obsahuje podrobné informácie o filmoch (názov, rok vydania, dĺžka trvania).
-- **dim_directors** – obsahuje informácie o réžiséroch (meno, dátum narodenia).
-- **dim_actors** – obsahuje informácie o hercoch (meno, dátum narodenia, výška).
-- **dim_genres** – obsahuje žánre jednotlivých filmov.
-- **dim_dates** – obsahuje informácie o dátumoch hodnotenia (rok, mesiac, deň).
+Dimenzionálny model bol navrhnutý tak, aby umožňoval efektívnu analytiku filmových dát. Použitá je hviezdicová schéma (Star Schema), kde faktová tabuľka obsahuje metriky o hodnoteniach filmov a dimenzie poskytujú kontext pre analýzu.
 
 ## Faktová tabuľka: `fact_ratings`
 
-| Stĺpec           | Popis                                     |
-|------------------|-------------------------------------------|
-| `fact_ratingId`  | Primárny kľúč.                            |
-| `movie_id`       | ID filmu.                                 |
-| `user_id`        | ID používateľa.                           |
-| `rating`         | Hodnotenie filmu.                         |
-| `timestamp`      | Časové označenie hodnotenia.              |
-| `date_id`        | ID dátumu hodnotenia (prepojené s dim_date). |
-| `time_id`        | ID času hodnotenia (prepojené s dim_time). |
+| Stĺpec          | Typ         | Popis |
+|----------------|------------|------------------------------|
+| avg_rating   | DECIMAL(3,1) | Priemerné hodnotenie filmu |
+| total_votes  | INT        | Celkový počet hlasov |
+| median_rating| INT        | Mediánové hodnotenie filmu |
+| Actor_id     | VARCHAR(10) | Identifikátor herca |
+| Director_id  | VARCHAR(10) | Identifikátor režiséra |
+| dim_id_movies | VARCHAR(10) | Identifikátor filmu |
+| dim_datesid  | INT        | Identifikátor dátumu hodnotenia |
 
 ## Dimenzie
 
-- **`dim_movies`**: Obsahuje detaily o filmoch.  
-  **Atribúty**: `movie_id`, `title`, `year`, `duration`, `country`, `languages`, `production_company`.
+#### dim_movies
 
-- **`dim_directors`**: Informácie o režiséroch.  
-  **Atribúty**: `director_id`, `name`, `date_of_birth`.
+| Stĺpec          | Typ          | Popis |
+|----------------|-------------|---------------------------|
+| dim_id_movies | VARCHAR(10) | Identifikátor filmu |
+| movie_title  | VARCHAR(200) | Názov filmu |
+| movie_year   | INT         | Rok vydania |
+| date_published | DATE        | Dátum vydania |
+| movie_country | VARCHAR(250) | Krajina |
+| income       | VARCHAR(30)  | Príjmy z filmu |
+| languages    | VARCHAR(200) | Jazyky vo filme |
+| company      | VARCHAR(200) | Produkčná spoločnosť |
+| genre        | VARCHAR(20)  | Žáner filmu |
 
-- **`dim_actors`**: Informácie o hercoch.  
-  **Atribúty**: `actor_id`, `name`, `category`.
 
-- **`dim_genres`**: Obsahuje detaily o žánroch.  
-  **Atribúty**: `genre_id`, `name`.
+#### dim_dates
 
-- **`dim_dates`**: Informácie o dátume hodnotenia.  
-  **Atribúty**: `date_id`, `day`, `month`, `year`, `quarter`.
+| Stĺpec        | Typ  | Popis |
+|--------------|------|----------------------|
+| dim_datesID | INT  | Identifikátor dátumu |
+| date       | DATE | Dátum vydania filmu |
+| day        | INT  | Deň v mesiaci |
+| dayOfWeek  | INT  | Deň v týždni |
+| DayOfWeek_String | VARCHAR(10) | Názov dňa |
+| week       | INT  | Číslo týždňa |
+| month      | INT  | Číslo mesiaca |
+| month_String | VARCHAR(10) | Názov mesiaca |
+| year       | INT  | Rok |
 
-- **`dim_time`**: Podrobné časové údaje.  
-  **Atribúty**: `time_id`, `hour`, `minute`, `ampm`.
+#### dim_names_actor
 
----
+| Stĺpec          | Typ          | Popis |
+|----------------|-------------|---------------------------|
+| name_id      | VARCHAR(10) | Identifikátor herca |
+| name        | VARCHAR(100) | Meno herca |
+| date_of_birth | DATE        | Dátum narodenia |
+| known_for_movies | VARCHAR(100) | Najznámejšie filmy |
+| category      | VARCHAR(10)  | Kategória roly |
 
-![Star_schema](https://github.com/sofa229/IMDb/blob/main/star_diagram.png)
 
+
+#### dim_names_director
+
+| Stĺpec         | Typ          | Popis |
+|---------------|-------------|---------------------------|
+| name_id     | VARCHAR(10) | Identifikátor režiséra |
+| name       | VARCHAR(100) | Meno režiséra |
+| date_of_birth | DATE        | Dátum narodenia |
+| known_for_movies | VARCHAR(100) | Najznámejšie filmy |
+
+![Star_schema][(https://github.com/sofa229/IMDb/blob/4c2ce4cabd7c96cc1035950396f297daf9d50874/hviezdicovyimdb.png)]
 ---
 
 ## 3. ETL proces v Snowflake
